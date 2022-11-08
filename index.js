@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require('express');
 require('dotenv').config();
 app.use(cors());
@@ -18,11 +18,28 @@ async function run(){
         try{
             const foodsCollection = client.db('foodFor').collection('foods')
 
-            app.get('/foods', async(req, res) =>{   
+            const ordersCollection =client.db('foodFor').collection('orders')
+
+            app.get('/services', async(req, res) =>{   
                 const query ={}
                 const cursor = foodsCollection.find(query);
-                const foods = await cursor.toArray();
-                res.send(foods)
+                const services = await cursor.toArray();
+                // const count = await foodsCollection.estimatedDocumentCount()
+                // res.send({count, foods})
+                 res.send(services)
+            })
+
+            app.get('/services/:id', async (req, res) =>{
+                const id = req.params.id;
+                const query = {_id: ObjectId(id)};
+                const service = await foodsCollection.findOne(query);
+                res.send(service)
+            })
+
+            app.post('/orders', async (req, res) =>{
+                const order = req.body;
+                const result = await ordersCollection.insertOne(order);
+                res.send(result)
             })
         }
         finally{
