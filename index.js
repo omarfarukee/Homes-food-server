@@ -35,15 +35,13 @@ async function run(){
                 const service = await foodsCollection.findOne(query);
                 res.send(service)
             })
+            
+            app.post('/services', async (req, res) =>{
+                const service = req.body;
+                const result = await foodsCollection.insertOne(service);
+                res.send(result)
+            })
 //--------------- review data load create -section---------------------------
-
-            // app.get('/review', async(req , res) =>{
-            //     const query = {}
-            //     const cursor = reviewCollection.find(query);
-            //     const reviews = await cursor.toArray();
-            //     res.send(reviews)
-            // })
-
             app.get('/review', async(req , res) =>{
                 console.log(req.query.email)
                 let query = {};
@@ -57,9 +55,58 @@ async function run(){
                 res.send(reviews)
             })
 
+            app.get('/review', async(req , res) =>{
+                console.log(req.query.serviceId)
+                let query = {};
+                if(req.query.serviceId){
+                    query ={
+                        serviceId: req.query.serviceId
+                    }
+                }
+                const cursor = reviewCollection.find(query);
+                const reviewsAll = await cursor.toArray();
+                res.send(reviewsAll)
+            })
+
+
+            app.get('/review/:id', async(req , res) =>{
+                const id = req.params.id;
+                const query = {_id : ObjectId(id)};
+                const result = await reviewCollection.findOne(query);
+                res.send(result)
+            })
+
+            // app.put('/review/:id', async(req, res) => {
+            //     const id =req.params.id;
+            //     const filter = {_id : ObjectId(id)};
+            //     const update= req.body;
+            //     const option = {upsert : true};
+            //     const updateReview ={
+            //         $set : {
+            //             message : update.message
+            //         }
+            //     }
+            //     const result = await reviewCollection.updateOne(filter, updateReview, option);
+            //     res.send(result)
+            //     console.log(updateReview)
+            // } )
+
             app.post('/review', async (req, res) =>{
                 const order = req.body;
                 const result = await reviewCollection.insertOne(order);
+                res.send(result)
+            })
+
+            app.patch('/review/:id', async(req, res) =>{
+                const id = req.params.id;
+                const message = req.body.message
+                const query = {_id : ObjectId(id)};
+                const updateReview = {
+                    $set : {
+                        message : message
+                    }
+                }
+                const result = await reviewCollection.updateOne(query, updateReview);
                 res.send(result)
             })
 
