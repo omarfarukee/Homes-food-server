@@ -43,7 +43,7 @@ async function run(){
             //     const reviews = await cursor.toArray();
             //     res.send(reviews)
             // })
-            
+
             app.get('/review', async(req , res) =>{
                 console.log(req.query.email)
                 let query = {};
@@ -60,6 +60,13 @@ async function run(){
             app.post('/review', async (req, res) =>{
                 const order = req.body;
                 const result = await reviewCollection.insertOne(order);
+                res.send(result)
+            })
+
+            app.delete('/review/:id', async(req , res) =>{
+                const id = req.params.id;
+                const query = {_id : ObjectId(id)};
+                const result = await reviewCollection.deleteOne(query);
                 res.send(result)
             })
         }
